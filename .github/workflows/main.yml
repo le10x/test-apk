@@ -1,17 +1,17 @@
 name: Compilar APK Python
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main" ] # Asegúrate de que tu rama se llame "main" o "master"
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04 # Versión estable compatible con Buildozer
     steps:
     - name: Descargar codigo
       uses: actions/checkout@v4
 
     - name: Compilar APK con Buildozer
-      uses: ArtemGovorov/buildozer-action@v1
+      uses: ArtemSBulgakov/buildozer-action@v1 # <- AQUÍ ESTÁ LA CORRECCIÓN
       with:
         workdir: .
         buildozer_version: stable
