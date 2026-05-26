@@ -1,39 +1,31 @@
-name: Compilar APK Python Manual
+name: Compilar APK Nativo Kotlin
 on:
   push:
-    branches: [ "main" ] # Cambia a "master" si tu rama se llama así
+    branches: [ "main" ]
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
-
+    runs-on: ubuntu-latest
     steps:
     - name: Descargar codigo
       uses: actions/checkout@v4
 
-    - name: Configurar Python
-      uses: actions/setup-python@v5
+    - name: Configurar Java 17
+      uses: actions/setup-java@v4
       with:
-        python-version: '3.11'
+        java-version: '17'
+        distribution: 'temurin'
+        cache: gradle # Guarda en memoria las dependencias para que la proxima vez tarde segundos
 
-    - name: Instalar Dependencias del Sistema
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev sqlite3 bzip2 libbz2-dev
+    - name: Dar permisos al compilador
+      run: chmod +x gradlew
 
-    - name: Instalar Cython y Buildozer
-      run: |
-        pip install --upgrade pip
-        pip install setuptools cython==0.29.36 buildozer
-
-    - name: Compilar APK con Buildozer
-      run: |
-        # El comando 'yes' acepta las licencias del SDK de Android automáticamente
-        yes | buildozer android debug
+    - name: Compilar APK de prueba
+      run: ./gradlew assembleDebug
 
     - name: Subir APK generado
       uses: actions/upload-artifact@v4
       with:
-        name: apk-python-exitoso
-        path: bin/*.apk
+        name: apk-kotlin-nativo
+        path: app/build/outputs/apk/debug/app-debug.apk
         
