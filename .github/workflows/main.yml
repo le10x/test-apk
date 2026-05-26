@@ -1,31 +1,45 @@
-name: Compilar APK Nativo Kotlin
+name: Compilar APK C++
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main" ] # Cambia a master si tu rama principal se llama así
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+
     steps:
     - name: Descargar codigo
       uses: actions/checkout@v4
 
-    - name: Configurar Java 17
+    - name: Configurar Java y Python
       uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
-        cache: gradle # Guarda en memoria las dependencias para que la proxima vez tarde segundos
 
-    - name: Dar permisos al compilador
-      run: chmod +x gradlew
+    - name: Configurar Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
 
-    - name: Compilar APK de prueba
-      run: ./gradlew assembleDebug
+    - name: Instalar compiladores de C++ y herramientas Android
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y git zip unzip python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev sqlite3 bzip2 libbz2-dev libasound2-dev libmesa-dev-bin
+        sudo apt-get install -y build-essential cmake traditional-cpp
 
-    - name: Subir APK generado
+    - name: Instalar Buildozer
+      run: |
+        pip install --upgrade pip
+        pip install "cython<3.0.0" buildozer
+
+    - name: Compilar APK C++ con Buildozer
+      run: |
+        yes | buildozer android debug
+
+    - name: Guardar APK C++ generado
       uses: actions/upload-artifact@v4
       with:
-        name: apk-kotlin-nativo
-        path: app/build/outputs/apk/debug/app-debug.apk
+        name: mi-apk-cpp
+        path: bin/*.apk
         
